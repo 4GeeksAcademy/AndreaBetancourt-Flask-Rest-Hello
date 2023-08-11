@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, People, Planets # Editar para agregar nuevos modelos cada que se crea en admin y models
 #from models import Person
 
 app = Flask(__name__)
@@ -36,6 +36,11 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
+
+# Endpoints: Aqui inicia el codigo
+
+
 @app.route('/user', methods=['GET'])
 def handle_hello():
 
@@ -44,6 +49,26 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/planets', methods=['GET'])
+def get_planets ():
+    planets = Planets.query.all() #query.all trae todo lo que esta dentro de Planets en una lista
+    planets_serialized = [planet.serialize() for planet in planets]
+    return jsonify(planets_serialized)
+
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planets_id (planet_id):
+    planet = Planets.query.filter_by(id = planet_id)
+    planet_serialized_id = [planet[0].serialize()]
+    return jsonify(planet_serialized_id)
+
+
+@app.route('/people', methods=['GET'])
+def get_people():
+    people = People.query.all()
+    people_serialized = [person.serialize() for person in people]
+    return jsonify(people_serialized)
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
